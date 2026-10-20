@@ -3,10 +3,12 @@
 Run locally:   python app.py            (http://localhost:5000)
 Production:    gunicorn app:app
 API:           POST /api/predict  {"review": "..."}  ->  {"label": "positive", "confidence": 0.93, ...}
+"""
 import os
 
 from flask import Flask, jsonify, request
 
+import sentiment
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 MAX_CHARS = 5000
@@ -14,6 +16,7 @@ MAX_CHARS = 5000
 app = Flask(__name__, static_folder=os.path.join(HERE, "docs"), static_url_path="")
 
 
+@app.get("/")
 def index():
     # Same page as the static GitHub Pages demo, but told to call this server's API.
     with open(os.path.join(HERE, "docs", "index.html"), encoding="utf-8") as f:

@@ -1,0 +1,91 @@
+review,sentiment,split
+"I went in with low expectations and walked out grinning. Smart script, warm performances, and a finale that earned its tears.",1,train
+"Beautifully shot and genuinely moving. The lead actress carries every scene with quiet confidence.",1,train
+"A tense, clever thriller that kept me guessing until the very last scene. Loved it.",1,train
+"Funny, charming and full of heart. I'd happily watch it again this weekend.",1,train
+"The soundtrack alone is worth the ticket, but the story is just as good. Easily the best film I've seen this year.",1,train
+"Not a single dull moment. The pacing is sharp and the dialogue crackles.",1,train
+"I wasn't expecting much, but this was a pleasant surprise. Really well made and surprisingly emotional.",1,train
+"Great cast, great chemistry, great fun. The whole family enjoyed it.",1,train
+"An ambitious, imaginative sci-fi film that actually delivers on its big ideas. Highly recommended.",1,train
+"The director has crafted something special here. Every frame feels deliberate and alive.",1,train
+"This is not your typical blockbuster; it is thoughtful, patient and deeply rewarding.",1,train
+"A delightful comedy with plenty of laugh-out-loud moments and a sweet center.",1,train
+"The performances are outstanding, especially the supporting cast who steal every scene.",1,train
+"I cried twice and laughed even more. A truly wonderful experience.",1,train
+"Stylish, smart and endlessly entertaining. One of the most enjoyable movies in years.",1,train
+"The ending left me speechless in the best possible way. Brilliant storytelling.",1,train
+"Nothing about this film felt boring. It moves fast and never loses its emotional core.",1,train
+"A gorgeous, heartfelt drama with a standout script. I can't stop thinking about it.",1,train
+"Better than the original! The sequel improves on everything and still feels fresh.",1,train
+"Superb direction and a magnetic lead performance make this a must-see.",1,train
+"A rare film that is both fun and profound. I loved the characters and the world they live in.",1,train
+"The action scenes are thrilling and the story actually makes sense. What a ride!",1,train
+"Warm, witty and beautifully acted. It left the whole theater smiling.",1,train
+"Clever twists, a gripping mystery, and a strong ending. Absolutely worth watching.",1,train
+"I'm not usually a fan of musicals, but this one won me over completely. Fantastic songs and great energy.",1,train
+"Lovely animation, a touching story, and jokes that work for both kids and adults.",1,train
+"A tight, well-written thriller with real suspense. No wasted scenes.",1,train
+"It's hard to believe how good this is. The writing, acting and music all work perfectly together.",1,train
+"This movie is a joy from start to finish. Pure cinematic comfort food done right.",1,train
+"Powerful, honest and unforgettable. The final scene will stay with me for a long time.",1,train
+"Really enjoyed this one. The humor lands, the plot is solid, and the cast is terrific.",1,test
+"A beautifully made film with a lot of heart and a fantastic lead performance.",1,test
+"Smart, suspenseful and surprisingly funny. I had a great time.",1,test
+"Not bad at all, actually quite good! The second half is especially strong.",1,test
+"An absolute delight. Gorgeous visuals, a brilliant score and a story that moved me.",1,test
+"The film is moving without being manipulative, and the ensemble cast is superb.",1,test
+"I loved the atmosphere and the characters. A wonderful, immersive movie.",1,test
+"Sharp writing and excellent pacing make this a thoroughly entertaining watch.",1,test
+"This is the kind of film you want to recommend to everyone. Heartfelt and brilliant.",1,test
+"Great story, great acting, and an ending that actually works. Two thumbs up.",1,test
+"One of the best movies of the decade. Stunning performances and a gripping plot.",1,test
+"Surprisingly touching and very well acted. I'd gladly see it again.",1,test
+"A fun, fast, feel-good adventure with real charm.",1,test
+"The story is fresh, the visuals are stunning, and the lead is fantastic.",1,test
+"Nothing short of a masterpiece. I was captivated from the first minute.",1,test
+"This film was a huge disappointment. The plot made no sense and the pacing dragged on forever.",0,train
+"Boring, predictable and far too long. I nearly fell asleep halfway through.",0,train
+"The acting was wooden and the dialogue was painful to listen to. Complete waste of time.",0,train
+"I really wanted to like this, but it just never comes together. Messy and lifeless.",0,train
+"Not funny, not clever, and not worth the ticket price. Skip it.",0,train
+"A tedious mess with flat characters and a story that goes nowhere.",0,train
+"The special effects looked cheap and the script was awful. I regret watching it.",0,train
+"Painfully slow and strangely pointless. Nothing happens for two hours.",0,train
+"The twist was obvious from the first ten minutes, and the rest was just filler. Very disappointing.",0,train
+"What a letdown. Great trailer, terrible movie.",0,train
+"I didn't care about a single character. The whole thing felt cold and empty.",0,train
+"A bloated, self-important film with nothing interesting to say.",0,train
+"Terrible editing, confusing story, and a lead performance with zero charisma.",0,train
+"This is not a good movie. The jokes fall flat and the plot is a mess.",0,train
+"I walked out halfway through. Dull, noisy and utterly forgettable.",0,train
+"The sequel is much worse than the original. Lazy writing and recycled ideas everywhere.",0,train
+"Unwatchable. The sound was bad, the acting was bad, and the story was worse.",0,train
+"It tries so hard to be profound but ends up shallow and boring.",0,train
+"Overlong and underwhelming. I kept checking my watch.",0,train
+"A cheap cash-grab with no creativity. Honestly one of the worst films I've seen.",0,train
+"The humor is crude, the pacing is awful and the ending makes no sense. Avoid.",0,train
+"Weak script, bland visuals, and a disappointing finale. Nothing here works.",0,train
+"I expected so much more. The characters are annoying and the plot is full of holes.",0,train
+"Never again. A joyless, clumsy movie that wastes a talented cast.",0,train
+"Flat, lifeless and strangely irritating. I couldn't wait for it to end.",0,train
+"The film is not scary, not suspenseful, and not interesting. Just dull.",0,train
+"Sloppy and incoherent. The director clearly had no idea what story to tell.",0,train
+"A forgettable, mediocre thriller that never builds any tension.",0,train
+"Painful dialogue and a ridiculous plot. I laughed, but not in a good way.",0,train
+"Total disaster from start to finish. Do not waste your money.",0,train
+"The movie was awful. Boring story, terrible acting and a script full of clichés.",0,test
+"A dull, overlong slog. I wanted my money back.",0,test
+"Disappointing and forgettable. The plot is thin and the characters are flat.",0,test
+"Not worth watching. The pacing is slow and the ending is a letdown.",0,test
+"Honestly one of the worst movies I have ever seen. Terrible in every way.",0,test
+"I was bored from the first scene. Nothing about it felt original or exciting.",0,test
+"A clumsy, confusing mess with wooden performances and a pointless story.",0,test
+"The jokes don't land and the story is a mess. I did not enjoy this at all.",0,test
+"Lazy, predictable and boring. A complete waste of a good cast.",0,test
+"Poorly written and badly acted. I couldn't get into it at all.",0,test
+"What a mess. Awful pacing, weak dialogue and an ending that makes no sense.",0,test
+"I hated the characters and I hated the plot. Not recommended.",0,test
+"A lifeless, tedious film that never finds its footing. Very disappointing.",0,test
+"The movie is slow, predictable and not even a little bit fun.",0,test
+"Terrible script, cheap effects and zero chemistry between the leads.",0,test

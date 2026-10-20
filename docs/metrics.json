@@ -1,0 +1,71 @@
+{
+  "dataset": {
+    "main_rows": 4751,
+    "main_file": "data/reviews.csv",
+    "handwritten_train": 60,
+    "handwritten_test": 30
+  },
+  "baseline_main_only": {
+    "on_main_test": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "n": 951
+    },
+    "on_handwritten_test": {
+      "accuracy": 0.8667,
+      "precision": 0.8235,
+      "recall": 0.9333,
+      "f1": 0.875,
+      "n": 30
+    }
+  },
+  "best_params": {
+    "C": 0.1,
+    "handwritten_weight": 5
+  },
+  "handwritten_cv_accuracy": 0.7833,
+  "final_model": {
+    "on_main_test": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "n": 951
+    },
+    "on_handwritten_test": {
+      "accuracy": 0.8667,
+      "precision": 0.8235,
+      "recall": 0.9333,
+      "f1": 0.875,
+      "n": 30
+    }
+  },
+  "top_terms": {
+    "positive": [
+      "brilliant",
+      "wonderful",
+      "perfection",
+      "fantastic",
+      "splendid",
+      "incredible",
+      "excellent",
+      "remarkable",
+      "outstanding",
+      "stunning"
+    ],
+    "negative": [
+      "terrible",
+      "forgettable",
+      "awful",
+      "bad",
+      "complete",
+      "tedious",
+      "disaster",
+      "dull",
+      "abysmal",
+      "mediocre"
+    ]
+  }
+}

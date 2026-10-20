@@ -17,16 +17,18 @@ Paste a movie review and it tells you whether it is positive or negative **and w
 
 All numbers come from `model/metrics.json`, produced by `python train.py`.
 
+<!-- RESULTS:START -->
 | Test set | Accuracy | Precision | Recall | F1 | Size |
 |---|---|---|---|---|---|
-| Template-generated reviews (held-out 20%) | 100% | 1.00 | 1.00 | 1.00 | 951 |
-| **Hand-written, natural reviews (never trained on)** | **86.7%** | 0.82 | 0.93 | 0.88 | 30 |
+| **IMDB reviews (held-out 20%)** | 90.0% | 0.89 | 0.91 | 0.90 | 9917 |
+| Hand-written, natural reviews (never trained on) | 96.7% | 0.94 | 1.00 | 0.97 | 30 |
 
 **How to read this**
 
-- The main dataset (`data/reviews.csv`) is **generated from templates** (`generate_sample_data.py`). It is so regular that any model scores ~100% on it, so that number says little about real-world quality.
-- The **hand-written held-out set** is the realistic estimate. It has only 30 reviews, so treat 86.7% as "roughly 75–95%".
-- For a trustworthy benchmark, train on a real dataset such as [IMDB (50k reviews)](https://ai.stanford.edu/~amaas/data/sentiment/): `python train.py --data imdb.csv` (CSV with columns `review`, `sentiment` = 0/1). A TF-IDF + logistic regression pipeline typically reaches high-80s % there.
+- Trained on **49,582 real IMDB movie reviews** plus a small set of hand-written ones.
+- The IMDB number (90.0%) is measured on 9,917 reviews the model never saw, so it is a trustworthy estimate.
+- The 30 hand-written reviews are a second, tiny check (96.7%); treat it as rough.
+<!-- RESULTS:END -->
 
 Most informative words learned (from the model):
 positive: *brilliant, wonderful, perfection, fantastic, splendid* · negative: *terrible, forgettable, awful, bad, tedious*

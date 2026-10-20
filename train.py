@@ -52,17 +52,22 @@ def load_data(path):
     if not os.path.exists(path):
         print(f"{path} not found - generating it with generate_sample_data.py")
         subprocess.run([sys.executable, "generate_sample_data.py"], check=True)
-    main = pd.read_csv(path)[["review", "sentiment"]]
-    main = main.dropna().drop_duplicates()
+    main = pd.read_csv(path)[["review", "sentiment"]].dropna()
+    if not pd.api.types.is_numeric_dtype(main.sentiment):  # e.g. Kaggle IMDB uses "positive" / "negative"
+        main["sentiment"] = main.sentiment.str.strip().str.lower().map({"positive": 1, "negative": 0})
+    main = main.dropna(subset=["sentiment"])
+    main["sentiment"] = main.sentiment.astype(int)
+    main["review"] = main.review.astype(str).str.replace(r"<br\s*/?>", " ", regex=True)
+    main = main.drop_duplicates()
     hand = pd.read_csv("data/handwritten_reviews.csv")
     return main, hand
 
 
-def make_pipeline(C=1.0):
+def make_pipeline(C=1.0, max_features=5000):
     return Pipeline([
         ("tfidf", TfidfVectorizer(lowercase=True, token_pattern=r"[a-z']+",
                                   ngram_range=(1, 2), min_df=2, max_df=0.9,
-                                  max_features=5000, stop_words=STOP_WORDS)),
+                                  max_features=max_features, stop_words=STOP_WORDS)),
         ("clf", LogisticRegression(C=C, max_iter=1000, random_state=SEED)),
     ])
 
@@ -134,6 +139,41 @@ def top_terms(pipe, k=10):
             "negative": [str(names[i]) for i in order[:k]]}
 
 
+def update_readme(res, big):
+    """Rewrite the block between the RESULTS markers in README.md from the real numbers."""
+    if not os.path.exists("README.md"):
+        return
+    txt = open("README.md", encoding="utf-8").read()
+    a, b = "<!-- RESULTS:START -->", "<!-- RESULTS:END -->"
+    if a not in txt or b not in txt:
+        return
+    m, h = res["final_model"]["on_main_test"], res["final_model"]["on_handwritten_test"]
+    pct = lambda v: f"{v * 100:.1f}%"
+    name = "IMDB reviews (held-out 20%)" if big else "Template-generated reviews (held-out 20%)"
+    rows = [
+        "| Test set | Accuracy | Precision | Recall | F1 | Size |",
+        "|---|---|---|---|---|---|",
+        f"| {'**' if big else ''}{name}{'**' if big else ''} | {pct(m['accuracy'])} | {m['precision']:.2f} | {m['recall']:.2f} | {m['f1']:.2f} | {m['n']} |",
+        f"| Hand-written, natural reviews (never trained on) | {pct(h['accuracy'])} | {h['precision']:.2f} | {h['recall']:.2f} | {h['f1']:.2f} | {h['n']} |",
+    ]
+    if big:
+        notes = [
+            f"- Trained on **{res['dataset']['main_rows']:,} real IMDB movie reviews** plus a small set of hand-written ones.",
+            f"- The IMDB number ({pct(m['accuracy'])}) is measured on {m['n']:,} reviews the model never saw, so it is a trustworthy estimate.",
+            f"- The 30 hand-written reviews are a second, tiny check ({pct(h['accuracy'])}); treat it as rough.",
+        ]
+    else:
+        notes = [
+            "- The main dataset (`data/reviews.csv`) is **generated from templates** (`generate_sample_data.py`). It is so regular that any model scores ~100% on it, so that number says little about real-world quality.",
+            f"- The **hand-written held-out set** is the realistic estimate. It has only {h['n']} reviews, so treat {pct(h['accuracy'])} as a rough figure with a wide error bar.",
+            "- For a trustworthy benchmark, train on a real dataset such as IMDB (50k reviews): `python train.py --data \"IMDB Dataset.csv\"`.",
+        ]
+    block = a + "\n" + "\n".join(rows) + "\n\n**How to read this**\n\n" + "\n".join(notes) + "\n" + b
+    head, rest = txt.split(a, 1)
+    _, tail = rest.split(b, 1)
+    open("README.md", "w", encoding="utf-8").write(head + block + tail)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--data", default="data/reviews.csv")
@@ -143,12 +183,16 @@ def main():
     hand_train = hand[hand.split == "train"]
     hand_test = hand[hand.split == "test"]
 
+    big = len(main_df) >= 10000          # a real dataset (e.g. IMDB) rather than the small template set
+    max_feat = 20000 if big else 5000
+    print(f"{len(main_df):,} reviews loaded ({'real dataset' if big else 'small/template dataset'}); training...")
+
     X_tr, X_te, y_tr, y_te = train_test_split(
         main_df.review, main_df.sentiment, test_size=0.2, random_state=SEED,
         stratify=main_df.sentiment)
 
     # ---- 1) Baseline: trained on the main dataset only --------------------------------
-    base = make_pipeline().fit(X_tr, y_tr)
+    base = make_pipeline(max_features=max_feat).fit(X_tr, y_tr)
     res = {
         "dataset": {"main_rows": int(len(main_df)), "main_file": args.data,
                     "handwritten_train": int(len(hand_train)),
@@ -160,30 +204,42 @@ def main():
     }
 
     # ---- 2) Final model: main + up-weighted hand-written train, tuned -----------------
-    def fit_weighted(C, weight, X_extra, y_extra):
-        X = pd.concat([X_tr, X_extra], ignore_index=True)
-        y = pd.concat([y_tr, y_extra], ignore_index=True)
-        w = np.concatenate([np.ones(len(X_tr)), np.full(len(X_extra), weight)])
-        return make_pipeline(C).fit(X, y, clf__sample_weight=w)
+    def fit_weighted(C, weight, X_base, y_base, X_extra, y_extra):
+        X = pd.concat([X_base, X_extra], ignore_index=True)
+        y = pd.concat([y_base, y_extra], ignore_index=True)
+        w = np.concatenate([np.ones(len(X_base)), np.full(len(X_extra), weight)])
+        return make_pipeline(C, max_feat).fit(X, y, clf__sample_weight=w)
 
-    # Tune (C, weight) by 5-fold CV over the *hand-written train* reviews only: the template
-    # data is separable (100% for any setting), so it cannot tell good settings from bad ones.
-    skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=SEED)
-    scores = {}
-    for C in (0.1, 1, 10, 100):
-        for weight in (5, 25, 50):
-            accs = []
-            for a, b in skf.split(hand_train.review, hand_train.sentiment):
-                m = fit_weighted(C, weight, hand_train.review.iloc[a], hand_train.sentiment.iloc[a])
-                accs.append(accuracy_score(hand_train.sentiment.iloc[b], m.predict(hand_train.review.iloc[b])))
-            scores[(C, weight)] = float(np.mean(accs))
-    (best_C, best_w), best_cv = max(scores.items(), key=lambda kv: (kv[1], -kv[0][0]))
-    best = fit_weighted(best_C, best_w, hand_train.review, hand_train.sentiment)
+    if big:
+        # Real data: choose C on a validation slice of the main training data.
+        X_fit, X_val, y_fit, y_val = train_test_split(X_tr, y_tr, test_size=0.1, random_state=SEED, stratify=y_tr)
+        scores = {}
+        for C in (0.3, 1, 3, 10):
+            m_ = fit_weighted(C, 5, X_fit, y_fit, hand_train.review, hand_train.sentiment)
+            scores[C] = accuracy_score(y_val, m_.predict(X_val))
+            print(f"  C={C}: validation accuracy {scores[C]:.4f}")
+        best_C = max(scores, key=lambda c: (scores[c], -c))
+        best_w, best_cv = 5, scores[best_C]
+        res["validation_accuracy"] = round(float(best_cv), 4)
+    else:
+        # Template data is separable (100% for any setting), so tune (C, weight) by 5-fold CV
+        # over the *hand-written train* reviews only.
+        skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=SEED)
+        scores = {}
+        for C in (0.1, 1, 10, 100):
+            for weight in (5, 25, 50):
+                accs = []
+                for a, b in skf.split(hand_train.review, hand_train.sentiment):
+                    m_ = fit_weighted(C, weight, X_tr, y_tr, hand_train.review.iloc[a], hand_train.sentiment.iloc[a])
+                    accs.append(accuracy_score(hand_train.sentiment.iloc[b], m_.predict(hand_train.review.iloc[b])))
+                scores[(C, weight)] = float(np.mean(accs))
+        (best_C, best_w), best_cv = max(scores.items(), key=lambda kv: (kv[1], -kv[0][0]))
+        res["handwritten_cv_accuracy"] = round(best_cv, 4)
+    best = fit_weighted(best_C, best_w, X_tr, y_tr, hand_train.review, hand_train.sentiment)
 
     pred_main = best.predict(X_te)
     pred_hand = best.predict(hand_test.review)
     res["best_params"] = {"C": best_C, "handwritten_weight": best_w}
-    res["handwritten_cv_accuracy"] = round(best_cv, 4)
     res["final_model"] = {
         "on_main_test": metrics(y_te, pred_main),
         "on_handwritten_test": metrics(hand_test.sentiment, pred_hand),
@@ -202,7 +258,9 @@ def main():
     plot_confusion(confusion_matrix(hand_test.sentiment, pred_hand),
                    "Hand-written held-out reviews", "visualizations/confusion_matrix_handwritten.png")
     plot_confusion(confusion_matrix(y_te, pred_main),
-                   "Template-generated test set", "visualizations/confusion_matrix_main.png")
+                   "IMDB test set" if big else "Template-generated test set",
+                   "visualizations/confusion_matrix_main.png")
+    update_readme(res, big)
     plot_top_words(best, "visualizations/top_words.png")
 
     print(json.dumps(res, indent=2))

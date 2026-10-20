@@ -139,9 +139,12 @@
   document.querySelectorAll(".exb").forEach(b => b.addEventListener("click", () => { $("text").value = b.textContent; analyze(); }));
 
   fetch("metrics.json").then(r => r.json()).then(m => {
-    const h = m.final_model.on_handwritten_test;
-    $("metrics").textContent = "Accuracy on " + h.n + " held-out hand-written reviews: " + (h.accuracy*100).toFixed(0) +
-      "%. Trained mostly on template-generated data, so it is a learning project, not a production classifier.";
+    const big = m.dataset.main_rows >= 10000;
+    const t = big ? m.final_model.on_main_test : m.final_model.on_handwritten_test;
+    $("metrics").textContent = big
+      ? "Trained on " + m.dataset.main_rows.toLocaleString() + " IMDB reviews. Accuracy on " + t.n.toLocaleString() + " held-out reviews: " + (t.accuracy*100).toFixed(1) + "%."
+      : "Accuracy on " + t.n + " held-out hand-written reviews: " + (t.accuracy*100).toFixed(0) +
+        "%. Trained mostly on template-generated data, so it is a learning project, not a production classifier.";
   }).catch(() => {});
 })();
 </script>
